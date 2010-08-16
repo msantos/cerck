@@ -1,0 +1,36 @@
+
+Erlang interface to libcrack.
+
+
+HOW TO BUILD IT
+
+make
+
+
+HOW TO USE IT
+
+check(Password) -> ok | {error, string()}
+    Types   Passwod = [ binary() | string() ]
+
+
+EXAMPLES
+
+1> cerck:check(<<"foobar">>).
+{error,"it is based on a dictionary word"}
+2> 4> cerck:check(<<"f00b4r">>).
+ok
+
+
+*** WARNING ***
+
+Do NOT call check/2 without checking the .pwi, .pwd and .hwm files exit
+for the passed in dictionary path. cracklib calls exit(-1) if these
+files do not exist. This will cause the Erlang VM to exit.
+
+
+TODO
+
+* test the dictionaries exist before calling FascistOpen()
+
+* do all of this in pure Erlang
+
