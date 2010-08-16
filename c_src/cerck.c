@@ -36,6 +36,7 @@
 static ERL_NIF_TERM atom_ok;
 static ERL_NIF_TERM atom_error;
 static ERL_NIF_TERM atom_enomem;
+static ERL_NIF_TERM string_dictpath;
 
 static ERL_NIF_TERM error_tuple(ErlNifEnv *env, char *err);
 
@@ -46,6 +47,8 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
     atom_ok = enif_make_atom(env, "ok");
     atom_error = enif_make_atom(env, "error");
     atom_enomem = enif_make_atom(env, "enomem");
+
+    string_dictpath = enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
 
     return (0);
 }
@@ -87,7 +90,7 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     static ERL_NIF_TERM
 nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    return enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
+    return string_dictpath;
 }
 
     static ERL_NIF_TERM
