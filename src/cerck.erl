@@ -29,11 +29,15 @@
 %% ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %% POSSIBILITY OF SUCH DAMAGE.
 -module(cerck).
+-include("cerck.hrl").
 
 -export([
         dictpath/0,
-        check/1, check/2
+        check/1, check/2,
+        quality/1,
+        has/2, has/3
     ]).
+
 
 -on_load(on_load/0).
 
@@ -48,6 +52,38 @@ check(_,_) ->
 
 check(Passwd) ->
     check(Passwd, dictpath()).
+
+quality(Passwd) when is_binary(Passwd) ->
+    quality(binary_to_list(Passwd));
+quality(Passwd) when is_list(Passwd) ->
+    quality1(Passwd, #passwd_quality{}).
+
+quality1([], Stats) ->
+    Stats;
+quality1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
+    quality1(T, Stats#passwd_quality{lower = N+1});
+quality1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
+    quality1(T, Stats#passwd_quality{upper = N+1});
+quality1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
+    quality1(T, Stats#passwd_quality{number = N+1});
+quality1([_|T], #passwd_quality{other = N} = Stats) ->
+    quality1(T, Stats#passwd_quality{other = N+1}).
+
+has(lower, Stats) ->
+    has(lower, Stats, 1);
+has(upper, Stats) ->
+    has(upper, Stats, 1);
+has(number, Stats) ->
+    has(number, Stats, 1);
+has(other, Stats) ->
+    has(other, Stats, 1).
+
+has(lower, #passwd_quality{lower = N}, Min) when N >= Min -> true;
+has(upper, #passwd_quality{upper = N}, Min) when N >= Min -> true;
+has(number, #passwd_quality{number = N}, Min) when N >= Min -> true;
+has(other, #passwd_quality{other = N}, Min) when N >= Min -> true;
+has(Type, #passwd_quality{}, _) when Type == lower; Type == upper; Type == number; Type == other ->
+    false.
 
 
 privdir(File) ->
