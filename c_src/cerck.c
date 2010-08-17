@@ -38,31 +38,61 @@ static ERL_NIF_TERM atom_error;
 static ERL_NIF_TERM atom_enomem;
 static ERL_NIF_TERM string_dictpath;
 
+/* cracklib is not thread safe */
+typedef struct {
+    ErlNifMutex *lock;
+} PRIV;
+
 static ERL_NIF_TERM error_tuple(ErlNifEnv *env, char *err);
 
 
     static int
 load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
 {
+    PRIV *priv = NULL;
+
     atom_ok = enif_make_atom(env, "ok");
     atom_error = enif_make_atom(env, "error");
     atom_enomem = enif_make_atom(env, "enomem");
 
     string_dictpath = enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
 
+    priv = (PRIV *)enif_alloc(sizeof(PRIV));
+    if (priv == NULL)
+        return (-1);
+
+    priv->lock = enif_mutex_create("cerck_lock");
+    if (priv->lock == NULL)
+        return (-1);
+
+    *priv_data = priv;
+
     return (0);
 }
 
+    void
+unload(ErlNifEnv *env, void *priv_data)
+{
+    PRIV *priv = NULL;
+
+    priv = (PRIV *)enif_priv_data(env);
+    enif_mutex_destroy(priv->lock);
+    enif_free(priv);
+}  
 
 /* 1: password, 2: dictpath */
     static ERL_NIF_TERM
 nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
+    PRIV *priv = NULL;
+
     ErlNifBinary passwd;
     ErlNifBinary path;
 
     char *err = NULL;
 
+
+    priv = (PRIV *)enif_priv_data(env);
 
     if (!enif_inspect_iolist_as_binary(env, argv[0], &passwd))
         return enif_make_badarg(env);
@@ -79,7 +109,9 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     passwd.data[passwd.size-1] = '\0';
     path.data[path.size-1] = '\0';
 
+    enif_mutex_lock(priv->lock);
     err = (char *)FascistCheck((char *)passwd.data, (char *)path.data);
+    enif_mutex_unlock(priv->lock);
 
     enif_release_binary(&passwd);
     enif_release_binary(&path);
@@ -107,6 +139,6 @@ static ErlNifFunc nif_funcs[] = {
     {"dictpath", 0, nif_dictpath}
 };
 
-ERL_NIF_INIT(cerck, nif_funcs, load, NULL, NULL, NULL)
+ERL_NIF_INIT(cerck, nif_funcs, load, NULL, NULL, unload)
 
 
