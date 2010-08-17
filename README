@@ -23,7 +23,7 @@ ok
 
 *** WARNING ***
 
-Do NOT call check/2 without ensuring the dictionnary files (.pwi, .pwd
+Do NOT call check/2 without ensuring the dictionary files (.pwi, .pwd
 and .hwm extensions) exist. If the files do not exist, cracklib calls
 exit(-1), causing the Erlang VM to exit.
 
