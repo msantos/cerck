@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <crack.h>
+#include <string.h>
 #include "erl_nif.h"
 
 
@@ -106,12 +107,15 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     if (!enif_realloc_binary(&path, path.size+1))
         return atom_enomem;
 
+    /* passwd.size is now equal to old passwd.size+1 */
     passwd.data[passwd.size-1] = '\0';
     path.data[path.size-1] = '\0';
 
     enif_mutex_lock(priv->lock);
     err = (char *)FascistCheck((char *)passwd.data, (char *)path.data);
     enif_mutex_unlock(priv->lock);
+
+    (void)memset(passwd.data, '\0', passwd.size);
 
     enif_release_binary(&passwd);
     enif_release_binary(&path);
