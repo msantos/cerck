@@ -1,4 +1,4 @@
-%% Copyright (c) 2010, Michael Santos <michael.santos@gmail.com>
+%% Copyright (c) 2010-2012, Michael Santos <michael.santos@gmail.com>
 %% All rights reserved.
 %% 
 %% Redistribution and use in source and binary forms, with or without
@@ -56,18 +56,18 @@ check(Passwd) ->
 quality(Passwd) when is_binary(Passwd) ->
     quality(binary_to_list(Passwd));
 quality(Passwd) when is_list(Passwd) ->
-    quality1(Passwd, #passwd_quality{}).
+    quality_1(Passwd, #passwd_quality{}).
 
-quality1([], Stats) ->
+quality_1([], Stats) ->
     Stats;
-quality1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
-    quality1(T, Stats#passwd_quality{lower = N+1});
-quality1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
-    quality1(T, Stats#passwd_quality{upper = N+1});
-quality1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
-    quality1(T, Stats#passwd_quality{number = N+1});
-quality1([_|T], #passwd_quality{other = N} = Stats) ->
-    quality1(T, Stats#passwd_quality{other = N+1}).
+quality_1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
+    quality_1(T, Stats#passwd_quality{lower = N+1});
+quality_1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
+    quality_1(T, Stats#passwd_quality{upper = N+1});
+quality_1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
+    quality_1(T, Stats#passwd_quality{number = N+1});
+quality_1([_|T], #passwd_quality{other = N} = Stats) ->
+    quality_1(T, Stats#passwd_quality{other = N+1}).
 
 has(lower, Stats) ->
     has(lower, Stats, 1);
@@ -96,4 +96,3 @@ privdir(File) ->
 
 niflib() ->
     privdir(?MODULE).
-
