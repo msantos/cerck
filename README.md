@@ -1,9 +1,9 @@
-
 Erlang interface to libcrack.
 
 
 ## HOW TO BUILD IT
 
+    apt-get install libcrack2-dev
     make
 
 
@@ -45,13 +45,10 @@ For quality checks:
 ## *** WARNING ***
 
 > Do NOT call check/2 without ensuring the dictionary files (.pwi, .pwd
-> and .hwm extensions) exist. If the files do not exist, cracklib calls
-> exit(-1), causing the Erlang VM to exit.
+> and .hwm extensions) exist and are valid. If the files do not exist,
+> cracklib calls exit(-1), causing the Erlang VM to exit.
 
 
 ## TODO
 
-* test the dictionaries exist before calling FascistOpen()
-
 * do all of this in pure Erlang
-
