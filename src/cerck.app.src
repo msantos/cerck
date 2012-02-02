@@ -1,0 +1,3 @@
+{application, cerck,
+    [{description, "Password checks using cracklib"},
+    {vsn, "0.01"}]}.
