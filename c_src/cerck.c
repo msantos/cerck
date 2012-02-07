@@ -37,11 +37,11 @@
 static ERL_NIF_TERM atom_ok;
 static ERL_NIF_TERM atom_error;
 static ERL_NIF_TERM atom_enomem;
-static ERL_NIF_TERM string_dictpath;
 
 /* cracklib is not thread safe */
 typedef struct {
     ErlNifMutex *lock;
+    ERL_NIF_TERM dictpath;
 } PRIV;
 
 static ERL_NIF_TERM error_tuple(ErlNifEnv *env, char *err);
@@ -56,11 +56,11 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
     atom_error = enif_make_atom(env, "error");
     atom_enomem = enif_make_atom(env, "enomem");
 
-    string_dictpath = enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
-
     priv = (PRIV *)enif_alloc(sizeof(PRIV));
     if (priv == NULL)
         return (-1);
+
+    priv->dictpath = enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
 
     priv->lock = enif_mutex_create("cerck_lock");
     if (priv->lock == NULL)
@@ -126,7 +126,11 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     static ERL_NIF_TERM
 nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    return string_dictpath;
+    PRIV *priv = NULL;
+
+
+    priv = (PRIV *)enif_priv_data(env);
+    return priv->dictpath;
 }
 
     static ERL_NIF_TERM
