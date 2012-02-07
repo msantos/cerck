@@ -148,5 +148,3 @@ static ErlNifFunc nif_funcs[] = {
 };
 
 ERL_NIF_INIT(cerck, nif_funcs, load, NULL, NULL, unload)
-
-

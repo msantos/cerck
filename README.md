@@ -10,7 +10,7 @@ Erlang interface to libcrack.
 ## HOW TO USE IT
 
     check(Password) -> ok | {error, string()}
-        Types   Passwod = [ binary() | string() ]
+        Types   Password = [ binary() | string() ]
     
     quality(Password) -> #passwd_quality{}
     
