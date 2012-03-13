@@ -14,4 +14,3 @@ compile: $(REBAR)
 
 clean: $(REBAR)
 	@$(REBAR) clean
-
