@@ -11,13 +11,13 @@ Erlang interface to libcrack.
 
     check(Password) -> ok | {error, string()}
         Types   Password = [ binary() | string() ]
-    
+
     quality(Password) -> #passwd_quality{}
-    
+
     has(Type, Stats) -> true | false
         Types   Type = [ upper | lower | number | other ]
                 Stats = #passwd_quality{}
-    
+
     has(Type, Stats, Min) -> true | false
         Types   Type = [ upper | lower | number | other ]
                 Stats = #passwd_quality{}
@@ -38,7 +38,7 @@ For quality checks:
     #passwd_quality{upper = 0,lower = 3,number = 3,other = 0}
     3> cerck:has(number, S).
     true
-    4> cerck:has(other, S). 
+    4> cerck:has(other, S).
     false
 
 
