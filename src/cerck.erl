@@ -46,9 +46,9 @@ on_load() ->
     erlang:load_nif(niflib(), []).
 
 dictpath() ->
-    erlang:error(not_implemented).
+    erlang:nif_error(not_implemented).
 check(_,_) ->
-    erlang:error(not_implemented).
+    erlang:nif_error(not_implemented).
 
 check(Passwd) ->
     check(Passwd, dictpath()).
