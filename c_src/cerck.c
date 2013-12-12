@@ -56,7 +56,7 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
     atom_error = enif_make_atom(env, "error");
     atom_enomem = enif_make_atom(env, "enomem");
 
-    priv = (PRIV *)enif_alloc(sizeof(PRIV));
+    priv = enif_alloc(sizeof(PRIV));
     if (priv == NULL)
         return (-1);
 
@@ -76,7 +76,7 @@ unload(ErlNifEnv *env, void *priv_data)
 {
     PRIV *priv = NULL;
 
-    priv = (PRIV *)enif_priv_data(env);
+    priv = enif_priv_data(env);
     enif_mutex_destroy(priv->lock);
     enif_free(priv);
 }
@@ -93,7 +93,7 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     char *err = NULL;
 
 
-    priv = (PRIV *)enif_priv_data(env);
+    priv = enif_priv_data(env);
 
     if (!enif_inspect_iolist_as_binary(env, argv[0], &passwd))
         return enif_make_badarg(env);
@@ -129,7 +129,7 @@ nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     PRIV *priv = NULL;
 
 
-    priv = (PRIV *)enif_priv_data(env);
+    priv = enif_priv_data(env);
     return priv->dictpath;
 }
 
