@@ -27,7 +27,7 @@ Erlang interface to libcrack.
 
     1> cerck:check(<<"foobar">>).
     {error,"it is based on a dictionary word"}
-    2> 4> cerck:check(<<"f00b4r">>).
+    2> cerck:check(<<"f00b4r">>).
     ok
 
 For quality checks:
