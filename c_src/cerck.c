@@ -58,17 +58,17 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
 
     priv = enif_alloc(sizeof(PRIV));
     if (priv == NULL)
-        return (-1);
+        return -1;
 
     priv->dictpath = enif_make_string(env, GetDefaultCracklibDict(), ERL_NIF_LATIN1);
 
     priv->lock = enif_mutex_create("cerck_lock");
     if (priv->lock == NULL)
-        return (-1);
+        return -1;
 
     *priv_data = priv;
 
-    return (0);
+    return 0;
 }
 
     void
@@ -89,7 +89,6 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     ErlNifBinary path;
 
     char *err = NULL;
-
 
     priv = enif_priv_data(env);
 
@@ -124,10 +123,7 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     static ERL_NIF_TERM
 nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    PRIV *priv = NULL;
-
-
-    priv = enif_priv_data(env);
+    PRIV *priv = enif_priv_data(env);
     return priv->dictpath;
 }
 
@@ -138,7 +134,6 @@ error_tuple(ErlNifEnv *env, char *err)
             atom_error,
             enif_make_string(env, err, ERL_NIF_LATIN1));
 }
-
 
 static ErlNifFunc nif_funcs[] = {
     {"check", 2, nif_check},

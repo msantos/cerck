@@ -29,7 +29,7 @@
 %% ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %% POSSIBILITY OF SUCH DAMAGE.
 -module(cerck).
--include("cerck.hrl").
+-include_lib("cerck/include/cerck.hrl").
 
 -export([
         dictpath/0,
@@ -45,14 +45,19 @@
 on_load() ->
     erlang:load_nif(niflib(), []).
 
+-spec dictpath() -> string().
 dictpath() ->
     erlang:nif_error(not_implemented).
+
+-spec check(iodata(),iodata()) -> ok | {error, string()}.
 check(_,_) ->
     erlang:nif_error(not_implemented).
 
+-spec check(iodata()) -> ok | {error, string()}.
 check(Passwd) ->
     check(Passwd, dictpath()).
 
+-spec quality(string() | binary()) -> #passwd_quality{}.
 quality(Passwd) when is_binary(Passwd) ->
     quality(binary_to_list(Passwd));
 quality(Passwd) when is_list(Passwd) ->
@@ -69,6 +74,8 @@ quality_1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
 quality_1([_|T], #passwd_quality{other = N} = Stats) ->
     quality_1(T, Stats#passwd_quality{other = N+1}).
 
+-spec has('lower' | 'number' | 'other' | 'upper',
+    #passwd_quality{}) -> boolean().
 has(lower, Stats) ->
     has(lower, Stats, 1);
 has(upper, Stats) ->
@@ -78,6 +85,8 @@ has(number, Stats) ->
 has(other, Stats) ->
     has(other, Stats, 1).
 
+-spec has('lower' | 'number' | 'other' | 'upper',
+    #passwd_quality{},non_neg_integer()) -> boolean().
 has(lower, #passwd_quality{lower = N}, Min) when N >= Min -> true;
 has(upper, #passwd_quality{upper = N}, Min) when N >= Min -> true;
 has(number, #passwd_quality{number = N}, Min) when N >= Min -> true;

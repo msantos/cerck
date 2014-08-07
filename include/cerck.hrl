@@ -30,8 +30,8 @@
 %% POSSIBILITY OF SUCH DAMAGE.
 
 -record(passwd_quality, {
-        upper = 0,      % count of uppercase letters
-        lower = 0,      % count of lowercase letters
-        number = 0,     % count of numeric characters
-        other = 0       % count of everything else
+        upper = 0 :: non_neg_integer(),     % count of uppercase letters
+        lower = 0 :: non_neg_integer(),     % count of lowercase letters
+        number = 0 :: non_neg_integer(),    % count of numeric characters
+        other = 0 :: non_neg_integer()      % count of everything else
     }).
