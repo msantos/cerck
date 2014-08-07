@@ -74,9 +74,7 @@ load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
     void
 unload(ErlNifEnv *env, void *priv_data)
 {
-    PRIV *priv = NULL;
-
-    priv = enif_priv_data(env);
+    PRIV *priv = priv_data;
     enif_mutex_destroy(priv->lock);
     enif_free(priv);
 }
