@@ -4,7 +4,7 @@ Erlang interface to libcrack.
 ## HOW TO BUILD IT
 
     apt-get install libcrack2-dev
-    make
+    rebar3 compile
 
 
 ## HOW TO USE IT

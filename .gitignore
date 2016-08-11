@@ -1,3 +1,9 @@
 *.[oa]
 *.beam
+_build
+ebin/
+.erlang
+.eunit/
+priv/
+.rebar3/
 *.swp
