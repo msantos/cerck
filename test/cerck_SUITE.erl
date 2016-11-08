@@ -17,7 +17,7 @@ all() ->
     [fail, pass, quality].
 
 fail(_Config) ->
-    {error,"it is based on a dictionary word"} = cerck:check(<<"foobar">>),
+    {error, "it is based on a dictionary word"} = cerck:check(<<"foobar">>),
     ok.
 
 pass(_Config) ->

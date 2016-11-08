@@ -41,6 +41,8 @@
 
 -on_load(on_load/0).
 
+-type passwd_quality() :: #passwd_quality{}.
+-export_type([passwd_quality/0]).
 
 on_load() ->
     erlang:load_nif(niflib(), []).
@@ -49,33 +51,33 @@ on_load() ->
 dictpath() ->
     erlang:nif_error(not_implemented).
 
--spec check(iodata(),iodata()) -> ok | {error, string()}.
-check(_,_) ->
+-spec check(iodata(), iodata()) -> ok | {error, string()}.
+check(_, _) ->
     erlang:nif_error(not_implemented).
 
 -spec check(iodata()) -> ok | {error, string()}.
 check(Passwd) ->
     check(Passwd, dictpath()).
 
--spec quality(string() | binary()) -> #passwd_quality{}.
+-spec quality(string() | binary()) -> passwd_quality().
 quality(Passwd) when is_binary(Passwd) ->
     quality(binary_to_list(Passwd));
 quality(Passwd) when is_list(Passwd) ->
-    quality_1(Passwd, #passwd_quality{}).
+    quality1(Passwd, #passwd_quality{}).
 
-quality_1([], Stats) ->
+quality1([], Stats) ->
     Stats;
-quality_1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
-    quality_1(T, Stats#passwd_quality{lower = N+1});
-quality_1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
-    quality_1(T, Stats#passwd_quality{upper = N+1});
-quality_1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
-    quality_1(T, Stats#passwd_quality{number = N+1});
-quality_1([_|T], #passwd_quality{other = N} = Stats) ->
-    quality_1(T, Stats#passwd_quality{other = N+1}).
+quality1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
+    quality1(T, Stats#passwd_quality{lower = N+1});
+quality1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
+    quality1(T, Stats#passwd_quality{upper = N+1});
+quality1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
+    quality1(T, Stats#passwd_quality{number = N+1});
+quality1([_|T], #passwd_quality{other = N} = Stats) ->
+    quality1(T, Stats#passwd_quality{other = N+1}).
 
 -spec has('lower' | 'number' | 'other' | 'upper',
-    #passwd_quality{}) -> boolean().
+    passwd_quality()) -> boolean().
 has(lower, Stats) ->
     has(lower, Stats, 1);
 has(upper, Stats) ->
@@ -86,14 +88,14 @@ has(other, Stats) ->
     has(other, Stats, 1).
 
 -spec has('lower' | 'number' | 'other' | 'upper',
-    #passwd_quality{},non_neg_integer()) -> boolean().
+    passwd_quality(), non_neg_integer()) -> boolean().
 has(lower, #passwd_quality{lower = N}, Min) when N >= Min -> true;
 has(upper, #passwd_quality{upper = N}, Min) when N >= Min -> true;
 has(number, #passwd_quality{number = N}, Min) when N >= Min -> true;
 has(other, #passwd_quality{other = N}, Min) when N >= Min -> true;
-has(Type, #passwd_quality{}, _) when Type == lower; Type == upper; Type == number; Type == other ->
+has(Type, #passwd_quality{}, _)
+    when Type == lower; Type == upper; Type == number; Type == other ->
     false.
-
 
 privdir(File) ->
     filename:join([
