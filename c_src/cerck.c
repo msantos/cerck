@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2016, Michael Santos <michael.santos@gmail.com>
+/* Copyright (c) 2010-2021, Michael Santos <michael.santos@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,13 +45,13 @@ typedef struct {
     char *dictpath;
 } PRIV;
 
-static ERL_NIF_TERM error_tuple(ErlNifEnv *env, char *err);
+static ERL_NIF_TERM error_tuple(ErlNifEnv *env, const char *err);
 
 
     static int
 load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
 {
-    PRIV *priv = NULL;
+    PRIV *priv;
 
     atom_ok = enif_make_atom(env, "ok");
     atom_error = enif_make_atom(env, "error");
@@ -79,6 +79,7 @@ unload(ErlNifEnv *env, void *priv_data)
 {
     PRIV *priv = priv_data;
     enif_mutex_destroy(priv->lock);
+    free(priv->dictpath);
     enif_free(priv);
 }
 
@@ -86,12 +87,12 @@ unload(ErlNifEnv *env, void *priv_data)
     static ERL_NIF_TERM
 nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-    PRIV *priv = NULL;
+    PRIV *priv;
 
     ErlNifBinary passwd;
     ErlNifBinary path;
 
-    char *err = NULL;
+    const char *err;
 
     priv = enif_priv_data(env);
 
@@ -112,7 +113,7 @@ nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
     path.data[path.size-1] = '\0';
 
     enif_mutex_lock(priv->lock);
-    err = (char *)FascistCheck((char *)passwd.data, (char *)path.data);
+    err = FascistCheck((char *)passwd.data, (char *)path.data);
     enif_mutex_unlock(priv->lock);
 
     (void)memset(passwd.data, '\0', passwd.size);
@@ -131,7 +132,7 @@ nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
     static ERL_NIF_TERM
-error_tuple(ErlNifEnv *env, char *err)
+error_tuple(ErlNifEnv *env, const char *err)
 {
     return enif_make_tuple(env, 2,
             atom_error,
