@@ -30,10 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <stdlib.h>
-#include <crack.h>
 #include <string.h>
-#include "erl_nif.h"
 
+#include <crack.h>
+
+#include "erl_nif.h"
 
 static ERL_NIF_TERM atom_ok;
 static ERL_NIF_TERM atom_error;
@@ -41,107 +42,95 @@ static ERL_NIF_TERM atom_enomem;
 
 /* cracklib is not thread safe */
 typedef struct {
-    ErlNifMutex *lock;
-    char *dictpath;
+  ErlNifMutex *lock;
+  char *dictpath;
 } PRIV;
 
 static ERL_NIF_TERM error_tuple(ErlNifEnv *env, const char *err);
 
+static int load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info) {
+  PRIV *priv;
 
-    static int
-load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info)
-{
-    PRIV *priv;
+  atom_ok = enif_make_atom(env, "ok");
+  atom_error = enif_make_atom(env, "error");
+  atom_enomem = enif_make_atom(env, "enomem");
 
-    atom_ok = enif_make_atom(env, "ok");
-    atom_error = enif_make_atom(env, "error");
-    atom_enomem = enif_make_atom(env, "enomem");
+  priv = enif_alloc(sizeof(PRIV));
+  if (priv == NULL)
+    return -1;
 
-    priv = enif_alloc(sizeof(PRIV));
-    if (priv == NULL)
-        return -1;
+  priv->dictpath = strdup(GetDefaultCracklibDict());
+  if (priv->dictpath == NULL)
+    return -1;
 
-    priv->dictpath = strdup(GetDefaultCracklibDict());
-    if (priv->dictpath == NULL)
-        return -1;
+  priv->lock = enif_mutex_create("cerck_lock");
+  if (priv->lock == NULL)
+    return -1;
 
-    priv->lock = enif_mutex_create("cerck_lock");
-    if (priv->lock == NULL)
-        return -1;
+  *priv_data = priv;
 
-    *priv_data = priv;
-
-    return 0;
+  return 0;
 }
 
-    static void
-unload(ErlNifEnv *env, void *priv_data)
-{
-    PRIV *priv = priv_data;
-    enif_mutex_destroy(priv->lock);
-    free(priv->dictpath);
-    enif_free(priv);
+static void unload(ErlNifEnv *env, void *priv_data) {
+  PRIV *priv = priv_data;
+  enif_mutex_destroy(priv->lock);
+  free(priv->dictpath);
+  enif_free(priv);
 }
 
 /* 1: password, 2: dictpath */
-    static ERL_NIF_TERM
-nif_check(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
-{
-    PRIV *priv;
+static ERL_NIF_TERM nif_check(ErlNifEnv *env, int argc,
+                              const ERL_NIF_TERM argv[]) {
+  PRIV *priv;
 
-    ErlNifBinary passwd;
-    ErlNifBinary path;
+  ErlNifBinary passwd;
+  ErlNifBinary path;
 
-    const char *err;
+  const char *err;
 
-    priv = enif_priv_data(env);
+  priv = enif_priv_data(env);
 
-    if (!enif_inspect_iolist_as_binary(env, argv[0], &passwd))
-        return enif_make_badarg(env);
+  if (!enif_inspect_iolist_as_binary(env, argv[0], &passwd))
+    return enif_make_badarg(env);
 
-    if (!enif_inspect_iolist_as_binary(env, argv[1], &path))
-        return enif_make_badarg(env);
+  if (!enif_inspect_iolist_as_binary(env, argv[1], &path))
+    return enif_make_badarg(env);
 
-    /* NULL terminate strings */
-    if (!enif_realloc_binary(&passwd, passwd.size+1))
-        return atom_enomem;
-    if (!enif_realloc_binary(&path, path.size+1))
-        return atom_enomem;
+  /* NULL terminate strings */
+  if (!enif_realloc_binary(&passwd, passwd.size + 1))
+    return atom_enomem;
+  if (!enif_realloc_binary(&path, path.size + 1))
+    return atom_enomem;
 
-    /* passwd.size is now equal to old passwd.size+1 */
-    passwd.data[passwd.size-1] = '\0';
-    path.data[path.size-1] = '\0';
+  /* passwd.size is now equal to old passwd.size+1 */
+  passwd.data[passwd.size - 1] = '\0';
+  path.data[path.size - 1] = '\0';
 
-    enif_mutex_lock(priv->lock);
-    err = FascistCheck((char *)passwd.data, (char *)path.data);
-    enif_mutex_unlock(priv->lock);
+  enif_mutex_lock(priv->lock);
+  err = FascistCheck((char *)passwd.data, (char *)path.data);
+  enif_mutex_unlock(priv->lock);
 
-    (void)memset(passwd.data, '\0', passwd.size);
+  (void)memset(passwd.data, '\0', passwd.size);
 
-    enif_release_binary(&passwd);
-    enif_release_binary(&path);
+  enif_release_binary(&passwd);
+  enif_release_binary(&path);
 
-    return ( (err == NULL) ? atom_ok : error_tuple(env, err));
+  return ((err == NULL) ? atom_ok : error_tuple(env, err));
 }
 
-    static ERL_NIF_TERM
-nif_dictpath(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
-{
-    PRIV *priv = enif_priv_data(env);
-    return enif_make_string(env, priv->dictpath, ERL_NIF_LATIN1);
+static ERL_NIF_TERM nif_dictpath(ErlNifEnv *env, int argc,
+                                 const ERL_NIF_TERM argv[]) {
+  PRIV *priv = enif_priv_data(env);
+  return enif_make_string(env, priv->dictpath, ERL_NIF_LATIN1);
 }
 
-    static ERL_NIF_TERM
-error_tuple(ErlNifEnv *env, const char *err)
-{
-    return enif_make_tuple(env, 2,
-            atom_error,
-            enif_make_string(env, err, ERL_NIF_LATIN1));
+static ERL_NIF_TERM error_tuple(ErlNifEnv *env, const char *err) {
+  return enif_make_tuple(env, 2, atom_error,
+                         enif_make_string(env, err, ERL_NIF_LATIN1));
 }
 
-static ErlNifFunc nif_funcs[] = {
-    {"check", 2, nif_check},
-    {"dictpath", 0, nif_dictpath}
-};
+static ErlNifFunc nif_funcs[] = {{"check", 2, nif_check},
+                                 {"dictpath", 0, nif_dictpath}};
 
 ERL_NIF_INIT(cerck, nif_funcs, load, NULL, NULL, unload)

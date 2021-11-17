@@ -1,4 +1,4 @@
-%% Copyright (c) 2010-2014, Michael Santos <michael.santos@gmail.com>
+%% Copyright (c) 2010-2021, Michael Santos <michael.santos@gmail.com>
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,11 @@
 -include_lib("cerck/include/cerck.hrl").
 
 -export([
-        dictpath/0,
-        check/1, check/2,
-        quality/1,
-        has/2, has/3
-    ]).
-
+    dictpath/0,
+    check/1, check/2,
+    quality/1,
+    has/2, has/3
+]).
 
 -on_load(on_load/0).
 
@@ -67,17 +66,19 @@ quality(Passwd) when is_list(Passwd) ->
 
 quality1([], Stats) ->
     Stats;
-quality1([H|T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
-    quality1(T, Stats#passwd_quality{lower = N+1});
-quality1([H|T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
-    quality1(T, Stats#passwd_quality{upper = N+1});
-quality1([H|T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
-    quality1(T, Stats#passwd_quality{number = N+1});
-quality1([_|T], #passwd_quality{other = N} = Stats) ->
-    quality1(T, Stats#passwd_quality{other = N+1}).
+quality1([H | T], #passwd_quality{lower = N} = Stats) when H >= $a, H =< $z ->
+    quality1(T, Stats#passwd_quality{lower = N + 1});
+quality1([H | T], #passwd_quality{upper = N} = Stats) when H >= $A, H =< $Z ->
+    quality1(T, Stats#passwd_quality{upper = N + 1});
+quality1([H | T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
+    quality1(T, Stats#passwd_quality{number = N + 1});
+quality1([_ | T], #passwd_quality{other = N} = Stats) ->
+    quality1(T, Stats#passwd_quality{other = N + 1}).
 
--spec has('lower' | 'number' | 'other' | 'upper',
-    passwd_quality()) -> boolean().
+-spec has(
+    'lower' | 'number' | 'other' | 'upper',
+    passwd_quality()
+) -> boolean().
 has(lower, Stats) ->
     has(lower, Stats, 1);
 has(upper, Stats) ->
@@ -87,14 +88,18 @@ has(number, Stats) ->
 has(other, Stats) ->
     has(other, Stats, 1).
 
--spec has('lower' | 'number' | 'other' | 'upper',
-    passwd_quality(), non_neg_integer()) -> boolean().
+-spec has(
+    'lower' | 'number' | 'other' | 'upper',
+    passwd_quality(),
+    non_neg_integer()
+) -> boolean().
 has(lower, #passwd_quality{lower = N}, Min) when N >= Min -> true;
 has(upper, #passwd_quality{upper = N}, Min) when N >= Min -> true;
 has(number, #passwd_quality{number = N}, Min) when N >= Min -> true;
 has(other, #passwd_quality{other = N}, Min) when N >= Min -> true;
-has(Type, #passwd_quality{}, _)
-    when Type == lower; Type == upper; Type == number; Type == other ->
+has(Type, #passwd_quality{}, _) when
+    Type == lower; Type == upper; Type == number; Type == other
+->
     false.
 
 privdir(File) ->

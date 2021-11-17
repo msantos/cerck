@@ -1,4 +1,4 @@
-%% Copyright (c) 2010-2014, Michael Santos <michael.santos@gmail.com>
+%% Copyright (c) 2010-2021, Michael Santos <michael.santos@gmail.com>
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,12 @@
 %% POSSIBILITY OF SUCH DAMAGE.
 
 -record(passwd_quality, {
-        upper = 0 :: non_neg_integer(),     % count of uppercase letters
-        lower = 0 :: non_neg_integer(),     % count of lowercase letters
-        number = 0 :: non_neg_integer(),    % count of numeric characters
-        other = 0 :: non_neg_integer()      % count of everything else
-    }).
+    % count of uppercase letters
+    upper = 0 :: non_neg_integer(),
+    % count of lowercase letters
+    lower = 0 :: non_neg_integer(),
+    % count of numeric characters
+    number = 0 :: non_neg_integer(),
+    % count of everything else
+    other = 0 :: non_neg_integer()
+}).

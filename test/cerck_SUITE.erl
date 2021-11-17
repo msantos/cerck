@@ -5,13 +5,13 @@
 
 -export([
     all/0
-    ]).
+]).
 
 -export([
-        fail/1,
-        pass/1,
-        quality/1
-    ]).
+    fail/1,
+    pass/1,
+    quality/1
+]).
 
 all() ->
     [fail, pass, quality].

@@ -1,3 +1,11 @@
-{application, cerck,
-    [{description, "Password checks using cracklib"},
-    {vsn, "0.1.2"}]}.
+{application, cerck, [
+    {description, "Password checks using cracklib"},
+    {vsn, "0.1.2"},
+    {applications, [kernel, stdlib]},
+
+    {licenses, ["BSD-3"]},
+    {maintainers, ["Michael Santos"]},
+    {links, [
+        {"Github", "https://github.com/msantos/cerck"}
+    ]}
+]}.
