@@ -10,11 +10,12 @@
 -export([
     fail/1,
     pass/1,
-    quality/1
+    quality/1,
+    bad_dictionary/1
 ]).
 
 all() ->
-    [fail, pass, quality].
+    [fail, pass, quality, bad_dictionary].
 
 fail(_Config) ->
     {error, "it is based on a dictionary word"} = cerck:check(<<"foobar">>),
@@ -28,3 +29,8 @@ quality(_Config) ->
     true = cerck:has(number, Q),
     false = cerck:has(other, Q),
     ok.
+
+bad_dictionary(Config) ->
+    Bad_dict = filename:join([?config(data_dir, Config), "test"]),
+    {error, "error loading dictionary"} = cerck:check(<<"foobar">>, <<"/foo">>),
+    {error, "error loading dictionary"} = cerck:check(<<"foobar">>, Bad_dict).

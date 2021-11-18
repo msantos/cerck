@@ -41,14 +41,6 @@ For quality checks:
     4> cerck:has(other, S).
     false
 
-
-## *** WARNING ***
-
-> Do NOT call check/2 without ensuring the dictionary files (.pwi, .pwd
-> and .hwm extensions) exist and are valid. If the files do not exist,
-> cracklib calls exit(-1), causing the Erlang VM to exit.
-
-
 ## TODO
 
 * do all of this in pure Erlang

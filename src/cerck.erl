@@ -1,4 +1,5 @@
-%% Copyright (c) 2010-2021, Michael Santos <michael.santos@gmail.com>
+%%% @copyright 2010-2021, Michael Santos <michael.santos@gmail.com>
+
 %% All rights reserved.
 %%
 %% Redistribution and use in source and binary forms, with or without
@@ -46,18 +47,32 @@
 on_load() ->
     erlang:load_nif(niflib(), []).
 
+% @doc Get the cracklib dictionary path
+%
+% Returns the base path and filename prefix to the cracklib database.
+%
 -spec dictpath() -> string().
 dictpath() ->
     erlang:nif_error(not_implemented).
 
+% @doc Test for weak or predictable passwords, specifying the dictionary path
 -spec check(iodata(), iodata()) -> ok | {error, string()}.
 check(_, _) ->
     erlang:nif_error(not_implemented).
 
+% @doc Test for weak or predictable passwords
+%
+% ```
+% 1> cerck:check(<<"foobar">>).
+% {error,"it is based on a dictionary word"}
+% 2> cerck:check(<<"f00b4r">>).
+% ok
+% '''
 -spec check(iodata()) -> ok | {error, string()}.
 check(Passwd) ->
     check(Passwd, dictpath()).
 
+% @doc Analyze a password
 -spec quality(string() | binary()) -> passwd_quality().
 quality(Passwd) when is_binary(Passwd) ->
     quality(binary_to_list(Passwd));
@@ -75,6 +90,7 @@ quality1([H | T], #passwd_quality{number = N} = Stats) when H >= $0, H =< $9 ->
 quality1([_ | T], #passwd_quality{other = N} = Stats) ->
     quality1(T, Stats#passwd_quality{other = N + 1}).
 
+% @doc Test password for character types
 -spec has(
     'lower' | 'number' | 'other' | 'upper',
     passwd_quality()
@@ -88,6 +104,7 @@ has(number, Stats) ->
 has(other, Stats) ->
     has(other, Stats, 1).
 
+% @doc Test password for character types specifying a minimum number
 -spec has(
     'lower' | 'number' | 'other' | 'upper',
     passwd_quality(),
