@@ -6,4 +6,5 @@ ebin/
 .eunit/
 priv/
 .rebar3/
+doc/
 *.swp
