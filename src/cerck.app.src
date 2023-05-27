@@ -1,6 +1,6 @@
 {application, cerck, [
     {description, "Password checks using cracklib"},
-    {vsn, "0.1.4"},
+    {vsn, "0.1.5"},
     {applications, [kernel, stdlib]},
 
     {licenses, ["BSD-3-Clause"]},
